@@ -19,8 +19,9 @@ jobs:
         run: |
           python - <<'PY'
           import ast, pathlib, yaml
+          dbt_ymls = [f for f in pathlib.Path('dbt_project').rglob('*.yml') if 'target' not in f.parts]
           for f in [*pathlib.Path('.').glob('docker-compose*.yml'), pathlib.Path('.github/workflows/ci.yml'),
-                    *pathlib.Path('dbt_project').rglob('*.yml'), pathlib.Path('dbt_project/profiles.yml.example')]:
+                    *dbt_ymls, pathlib.Path('dbt_project/profiles.yml.example')]:
               yaml.safe_load(f.read_text()); print('valid yaml:', f)
           ast.parse(pathlib.Path('dags/streamcommerce_pipeline.py').read_text()); print('dag parses')
           PY
