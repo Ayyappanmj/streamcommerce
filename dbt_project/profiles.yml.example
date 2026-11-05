@@ -1,0 +1,8 @@
+# Copy to profiles.yml (the pipeline does this automatically). No credentials: DuckDB is a local file.
+streamcommerce:
+  target: local
+  outputs:
+    local:
+      type: duckdb
+      path: "{{ env_var('STREAMCOMMERCE_WAREHOUSE_PATH', '../data/warehouse/streamcommerce.duckdb') }}"
+      threads: 1

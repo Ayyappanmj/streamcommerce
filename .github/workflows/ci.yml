@@ -1,0 +1,32 @@
+name: ci
+on:
+  push: { branches: [main] }
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11", cache: pip }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "17" }
+      - name: Install dependencies
+        run: python -m pip install -r requirements-dev.txt
+      - name: Ruff
+        run: ruff check .
+      - name: Validate configuration files
+        run: |
+          python - <<'PY'
+          import ast, pathlib, yaml
+          for f in [*pathlib.Path('.').glob('docker-compose*.yml'), pathlib.Path('.github/workflows/ci.yml'),
+                    *pathlib.Path('dbt_project').rglob('*.yml'), pathlib.Path('dbt_project/profiles.yml.example')]:
+              yaml.safe_load(f.read_text()); print('valid yaml:', f)
+          ast.parse(pathlib.Path('dags/streamcommerce_pipeline.py').read_text()); print('dag parses')
+          PY
+      - name: Unit, data-quality and idempotency tests (no external services)
+        run: pytest -m "not external" -q
+      - name: dbt integration (local DuckDB, no credentials)
+        run: pytest tests/integration/test_dbt.py -q
+      - name: dbt parse
+        run: cd dbt_project && cp profiles.yml.example profiles.yml && dbt parse --profiles-dir .

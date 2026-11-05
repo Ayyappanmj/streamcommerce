@@ -1,0 +1,19 @@
+name: streamcommerce
+version: "1.0.0"
+config-version: 2
+profile: streamcommerce
+model-paths: ["models"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+clean-targets: ["target", "dbt_packages"]
+
+# Everything is a table: Python reloads the raw.* tables, and DuckDB views would block replacing their sources.
+models:
+  streamcommerce:
+    +materialized: table
+    staging:
+      +schema: staging
+    intermediate:
+      +schema: staging
+    marts:
+      +schema: analytics
