@@ -14,7 +14,9 @@ pytest.importorskip("duckdb")
 def test_dbt_build_runs_models_and_tests_on_local_warehouse(tmp_path):
     dbt = os.environ.get("DBT_EXECUTABLE") or shutil.which("dbt")
     if not dbt:
-        candidate = Path(sys.prefix) / ("Scripts" if sys.platform == "win32" else "bin") / ("dbt.exe" if sys.platform == "win32" else "dbt")
+        bindir = "Scripts" if sys.platform == "win32" else "bin"
+        exe = "dbt.exe" if sys.platform == "win32" else "dbt"
+        candidate = Path(sys.prefix) / bindir / exe
         if candidate.exists():
             dbt = str(candidate)
     if not dbt:

@@ -54,7 +54,9 @@ def run_dbt(settings: Settings) -> str:
     """Run ``dbt build`` against the local DuckDB warehouse; raise with dbt's real output on failure."""
     dbt = os.environ.get("DBT_EXECUTABLE") or shutil.which("dbt")
     if not dbt:
-        candidate = Path(sys.prefix) / ("Scripts" if sys.platform == "win32" else "bin") / ("dbt.exe" if sys.platform == "win32" else "dbt")
+        bindir = "Scripts" if sys.platform == "win32" else "bin"
+        exe = "dbt.exe" if sys.platform == "win32" else "dbt"
+        candidate = Path(sys.prefix) / bindir / exe
         if candidate.exists():
             dbt = str(candidate)
     if not dbt:
